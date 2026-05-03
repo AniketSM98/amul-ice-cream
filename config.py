@@ -19,7 +19,9 @@ def get_db_config() -> dict:
             "user":         str(s["DB_USER"]),
             "password":     str(s["DB_PASSWORD"]),
             "database":     str(s.get("DB_NAME", "ice_cream_shop")),
-            "ssl_disabled": False,   # TiDB Cloud requires SSL
+            "ssl_disabled":        False,   # TiDB Cloud requires SSL
+            "ssl_verify_cert":     False,
+            "ssl_verify_identity": False,
         }
     except Exception:
         return {
