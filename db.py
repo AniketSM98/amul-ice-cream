@@ -33,7 +33,10 @@ def query_df(sql: str, params: tuple = ()) -> pd.DataFrame:
         cur = conn.cursor(dictionary=True)
         cur.execute(sql, params)
         rows = cur.fetchall()
-        return pd.DataFrame(rows) if rows else pd.DataFrame()
+        if rows:
+            return pd.DataFrame(rows)
+        cols = [desc[0] for desc in cur.description] if cur.description else []
+        return pd.DataFrame(columns=cols)
     finally:
         conn.close()
 

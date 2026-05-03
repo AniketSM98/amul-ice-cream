@@ -18,20 +18,23 @@ with tab_view:
     show_inactive = st.toggle("Show inactive products", value=False)
     df = db.get_products(active_only=not show_inactive)
 
-    for cat in df["category"].unique():
-        st.markdown(f"#### {cat}")
-        cat_df = df[df["category"] == cat][["name", "price", "is_active", "description"]]
-        cat_df = cat_df.copy()
-        cat_df["price"] = cat_df["price"].apply(lambda x: f"{CURRENCY}{x:.2f}")
-        cat_df["is_active"] = cat_df["is_active"].map({1: "✅ Active", 0: "❌ Inactive"})
-        st.dataframe(
-            cat_df.rename(columns={
-                "name": "Product", "price": "Price",
-                "is_active": "Status", "description": "Description",
-            }),
-            use_container_width=True,
-            hide_index=True,
-        )
+    if df.empty:
+        st.info("No products found.")
+    else:
+        for cat in df["category"].unique():
+            st.markdown(f"#### {cat}")
+            cat_df = df[df["category"] == cat][["name", "price", "is_active", "description"]]
+            cat_df = cat_df.copy()
+            cat_df["price"] = cat_df["price"].apply(lambda x: f"{CURRENCY}{x:.2f}")
+            cat_df["is_active"] = cat_df["is_active"].apply(lambda x: "✅ Active" if x else "❌ Inactive")
+            st.dataframe(
+                cat_df.rename(columns={
+                    "name": "Product", "price": "Price",
+                    "is_active": "Status", "description": "Description",
+                }),
+                use_container_width=True,
+                hide_index=True,
+            )
 
 # ── ADD PRODUCT ───────────────────────────────────────────────────────────────
 with tab_add:

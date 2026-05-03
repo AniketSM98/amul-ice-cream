@@ -15,32 +15,34 @@ tab_view, tab_update, tab_add = st.tabs(["Stock Levels", "Update Stock", "Add In
 with tab_view:
     df = db.get_inventory()
 
-    # Color-code status
-    status_colors = {"Out of Stock": "🔴", "Low": "🟡", "OK": "🟢"}
-    df["Status"] = df["status"].map(status_colors) + " " + df["status"]
+    if df.empty:
+        st.info("No ingredients found. Add ingredients in the 'Add Ingredient' tab.")
+    else:
+        status_colors = {"Out of Stock": "🔴", "Low": "🟡", "OK": "🟢"}
+        df["Status"] = df["status"].map(status_colors) + " " + df["status"]
 
-    col_ok   = df[df["status"] == "OK"]
-    col_low  = df[df["status"] == "Low"]
-    col_out  = df[df["status"] == "Out of Stock"]
+        col_ok   = df[df["status"] == "OK"]
+        col_low  = df[df["status"] == "Low"]
+        col_out  = df[df["status"] == "Out of Stock"]
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("OK",           len(col_ok),  delta=None)
-    c2.metric("Low Stock",    len(col_low),  delta=None)
-    c3.metric("Out of Stock", len(col_out), delta=None)
+        c1, c2, c3 = st.columns(3)
+        c1.metric("OK",           len(col_ok),  delta=None)
+        c2.metric("Low Stock",    len(col_low),  delta=None)
+        c3.metric("Out of Stock", len(col_out), delta=None)
 
-    st.divider()
+        st.divider()
 
-    st.dataframe(
-        df[["name", "quantity", "unit", "reorder_level", "cost_per_unit", "Status", "last_updated"]].rename(
-            columns={
-                "name": "Ingredient", "quantity": "Current Qty", "unit": "Unit",
-                "reorder_level": "Reorder Level", "cost_per_unit": f"Cost/Unit ({CURRENCY})",
-                "last_updated": "Last Updated",
-            }
-        ),
-        use_container_width=True,
-        hide_index=True,
-    )
+        st.dataframe(
+            df[["name", "quantity", "unit", "reorder_level", "cost_per_unit", "Status", "last_updated"]].rename(
+                columns={
+                    "name": "Ingredient", "quantity": "Current Qty", "unit": "Unit",
+                    "reorder_level": "Reorder Level", "cost_per_unit": f"Cost/Unit ({CURRENCY})",
+                    "last_updated": "Last Updated",
+                }
+            ),
+            use_container_width=True,
+            hide_index=True,
+        )
 
 # ── UPDATE STOCK ──────────────────────────────────────────────────────────────
 with tab_update:
